@@ -3,6 +3,17 @@
   "framework": "vite",
   "buildCommand": "vite build",
   "outputDirectory": "dist",
+  "env": {
+    "NODE_ENV": "production",
+    "APP_URL": "https://project-3-0-ochre.vercel.app"
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
@@ -10,7 +21,11 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "*" },
-        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" }
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=()" },
+        { "key": "X-Frame-Options", "value": "DENY" }
       ]
     },
     {
@@ -19,16 +34,25 @@
         { "key": "Service-Worker-Allowed", "value": "/" },
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
   ],
   "rewrites": [
-    { "source": "/api/proxy", "destination": "/api/proxy" },
-    { "source": "/api/health", "destination": "/api/health" },
+    { "source": "/proxy/:path*", "destination": "/api/proxy?url=:path*" },
+    { "source": "/s/:payload*", "destination": "/api/scramble?payload=:payload*" },
     { "source": "/api/nodes/status", "destination": "/api/nodes-status" },
     { "source": "/api/audio/stream", "destination": "/api/audio-stream" },
     { "source": "/api/auth/spotify/url", "destination": "/api/auth-spotify-url" },
     { "source": "/api/auth/spotify/token", "destination": "/api/auth-spotify-token" },
+    { "source": "/api/proxy", "destination": "/api/proxy" },
+    { "source": "/api/health", "destination": "/api/health" },
     { "source": "/api/ws-tunnel", "destination": "/api/ws-tunnel" },
+    { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
